@@ -9,7 +9,7 @@ import queue
 import sys
 import threading
 import time
-from typing import Dict, List
+from typing import Dict
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -61,6 +61,7 @@ class MainWindow:
 
         self.monitoring_active = True
         self.stats: Dict[str, int] = {"changes": 0, "threats": 0, "scans": 0}
+        self.last_scan_time = "--"
 
         self._build_ui()
         self._start_services()
@@ -179,6 +180,8 @@ class MainWindow:
         self.root.after(200, self._process_queue)
 
     def _update_panels(self) -> None:
+        alert_counts = self.alert_manager.get_alert_counts()
+        self.stats["threats"] = sum(alert_counts.values())
         self.count_label.configure(text=f"Changes: {self.stats['changes']} | Threats: {self.stats['threats']}")
         self.time_label.configure(text=format_timestamp())
         # Update stats tab
@@ -198,6 +201,7 @@ class MainWindow:
             self.stats_labels["Changes"].configure(text=str(self.stats["changes"]))
             self.stats_labels["Threats"].configure(text=str(self.stats["threats"]))
             self.stats_labels["Scans"].configure(text=str(self.stats["scans"]))
+            self.stats_labels["Last Scan"].configure(text=self.last_scan_time)
             self.stats_labels["Path"].configure(text=monitor_path)
         except Exception:
             pass
@@ -232,8 +236,9 @@ class MainWindow:
     def _start_network_scan(self) -> None:
         def worker():
             self.network_results.delete("1.0", "end")
-            self.network_status.configure(text="Scanning...")
-            host = "127.0.0.1"
+            host = NetworkScanner.get_local_ip()
+            hostname = NetworkScanner.get_hostname()
+            self.network_status.configure(text=f"Scanning {hostname} ({host})...")
             results = self.network_scanner.scan_common_ports(host)
             for result in results:
                 risk = result.get("risk_level", "info")
@@ -249,8 +254,8 @@ class MainWindow:
                 self.db_manager.log_network_scan(result["port"], result["protocol"], result["service"], result["status"], risk)
                 if risk in {"critical", "high"}:
                     self.alert_manager.add_alert("network", risk, "Suspicious Port", line.strip(), source=host)
-                    self.stats["threats"] += 1
             self.stats["scans"] += 1
+            self.last_scan_time = format_timestamp()
             self.network_status.configure(text=f"Scan complete - {len(results)} open ports")
         threading.Thread(target=worker, daemon=True).start()
 

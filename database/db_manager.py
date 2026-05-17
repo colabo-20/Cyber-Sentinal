@@ -62,96 +62,188 @@ class DatabaseManager:
             return
         cursor = self.conn.cursor()
         try:
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS file_changes (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    change_type TEXT,
-                    file_path TEXT,
-                    file_hash TEXT,
-                    file_size INTEGER,
-                    severity TEXT,
-                    details TEXT,
-                    timestamp TEXT
+            if self.placeholder == "%s":
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS file_changes (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        change_type VARCHAR(50),
+                        file_path TEXT,
+                        file_hash VARCHAR(128),
+                        file_size BIGINT,
+                        severity VARCHAR(20),
+                        details TEXT,
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS threat_alerts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    alert_type TEXT,
-                    severity TEXT,
-                    source TEXT,
-                    description TEXT,
-                    action_taken TEXT,
-                    timestamp TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS threat_alerts (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        alert_type VARCHAR(100),
+                        severity VARCHAR(20),
+                        source TEXT,
+                        description TEXT,
+                        action_taken VARCHAR(100),
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS quarantine_log (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    original_path TEXT,
-                    quarantine_path TEXT,
-                    reason TEXT,
-                    file_hash TEXT,
-                    restored INTEGER,
-                    timestamp TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS quarantine_log (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        original_path TEXT,
+                        quarantine_path TEXT,
+                        reason TEXT,
+                        file_hash VARCHAR(128),
+                        restored TINYINT,
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS network_scans (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    port INTEGER,
-                    protocol TEXT,
-                    service TEXT,
-                    status TEXT,
-                    risk_level TEXT,
-                    timestamp TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS network_scans (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        port INT,
+                        protocol VARCHAR(10),
+                        service VARCHAR(100),
+                        status VARCHAR(20),
+                        risk_level VARCHAR(20),
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS process_log (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    pid INTEGER,
-                    name TEXT,
-                    status TEXT,
-                    cpu_percent REAL,
-                    memory_mb REAL,
-                    is_suspicious INTEGER,
-                    timestamp TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS process_log (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        pid INT,
+                        name VARCHAR(255),
+                        status VARCHAR(50),
+                        cpu_percent FLOAT,
+                        memory_mb FLOAT,
+                        is_suspicious TINYINT,
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS integrity_baseline (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    file_path TEXT UNIQUE,
-                    file_hash TEXT,
-                    file_size INTEGER,
-                    permissions TEXT,
-                    last_verified TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS integrity_baseline (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        file_path TEXT UNIQUE,
+                        file_hash VARCHAR(128),
+                        file_size BIGINT,
+                        permissions VARCHAR(10),
+                        last_verified VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS honeypot_events (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    honeypot_file TEXT,
-                    event_type TEXT,
-                    details TEXT,
-                    timestamp TEXT
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS honeypot_events (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        honeypot_file TEXT,
+                        event_type VARCHAR(50),
+                        details TEXT,
+                        timestamp VARCHAR(32)
+                    )
+                    """
                 )
-                """
-            )
+            else:
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS file_changes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        change_type TEXT,
+                        file_path TEXT,
+                        file_hash TEXT,
+                        file_size INTEGER,
+                        severity TEXT,
+                        details TEXT,
+                        timestamp TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS threat_alerts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        alert_type TEXT,
+                        severity TEXT,
+                        source TEXT,
+                        description TEXT,
+                        action_taken TEXT,
+                        timestamp TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS quarantine_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        original_path TEXT,
+                        quarantine_path TEXT,
+                        reason TEXT,
+                        file_hash TEXT,
+                        restored INTEGER,
+                        timestamp TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS network_scans (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        port INTEGER,
+                        protocol TEXT,
+                        service TEXT,
+                        status TEXT,
+                        risk_level TEXT,
+                        timestamp TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS process_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        pid INTEGER,
+                        name TEXT,
+                        status TEXT,
+                        cpu_percent REAL,
+                        memory_mb REAL,
+                        is_suspicious INTEGER,
+                        timestamp TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS integrity_baseline (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        file_path TEXT UNIQUE,
+                        file_hash TEXT,
+                        file_size INTEGER,
+                        permissions TEXT,
+                        last_verified TEXT
+                    )
+                    """
+                )
+                cursor.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS honeypot_events (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        honeypot_file TEXT,
+                        event_type TEXT,
+                        details TEXT,
+                        timestamp TEXT
+                    )
+                    """
+                )
             self.conn.commit()
         except Exception:
             pass
