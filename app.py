@@ -24,7 +24,7 @@ def launch_main_app() -> None:
     """
     _ = SETTINGS
     app = MainWindow()
-    app.mainloop()
+    app.run()
 
 
 def main() -> None:
@@ -33,7 +33,7 @@ def main() -> None:
     Author: Saad Zaffar Laghari (FA23-BCS-169)
     """
     login = LoginScreen(on_success_callback=launch_main_app)
-    login.mainloop()
+    login.run()
 
 
 if __name__ == "__main__":
