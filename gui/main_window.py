@@ -9,7 +9,7 @@ import queue
 import sys
 import threading
 import time
-from typing import Dict
+from typing import Dict, List
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
