@@ -1,7 +1,8 @@
-"""CyberSentinel v2.0.0 Configuration Module.
+"""Centralized configuration and settings management.
 
 Author: Saad Zaffar Laghari (FA23-BCS-169)
 """
+
 from __future__ import annotations
 
 import json
@@ -24,11 +25,8 @@ HONEYPOT_DIR = DATA_DIR / "honeypots"
 CONFIG_FILE = DATA_DIR / "settings.json"
 SQLITE_DB = DATA_DIR / "cybersentinel.db"
 
-for _dir in [DATA_DIR, QUARANTINE_DIR, AUDIT_DIR, REPORTS_DIR, RULES_DIR, HONEYPOT_DIR]:
-    try:
-        _dir.mkdir(parents=True, exist_ok=True)
-    except Exception:
-        pass
+for directory in [DATA_DIR, QUARANTINE_DIR, AUDIT_DIR, REPORTS_DIR, RULES_DIR, HONEYPOT_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_SETTINGS: Dict[str, Any] = {
     "monitor_path": str(Path.home() / "Desktop" / "monitor_folder"),
@@ -81,19 +79,19 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
 
 
 def load_settings() -> Dict[str, Any]:
-    """Load settings from disk, merging with defaults.
+    """Load persisted settings and merge with defaults.
 
     Author: Saad Zaffar Laghari (FA23-BCS-169)
     """
     settings = DEFAULT_SETTINGS.copy()
     try:
         if CONFIG_FILE.exists():
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                saved = json.load(f)
-                if isinstance(saved, dict):
-                    settings.update(saved)
+            with CONFIG_FILE.open("r", encoding="utf-8") as file:
+                saved = json.load(file)
+            if isinstance(saved, dict):
+                settings.update(saved)
     except Exception:
-        return DEFAULT_SETTINGS.copy()
+        return settings
     return settings
 
 
@@ -104,8 +102,8 @@ def save_settings(settings: Dict[str, Any]) -> None:
     """
     try:
         CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-            json.dump(settings, f, indent=2)
+        with CONFIG_FILE.open("w", encoding="utf-8") as file:
+            json.dump(settings, file, indent=2)
     except Exception:
         pass
 
