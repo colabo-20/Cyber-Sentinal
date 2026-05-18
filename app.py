@@ -1,4 +1,4 @@
-"""CyberSentinel entry point.
+"""CyberSentinel v2.0.0 entry point.
 
 Author: Saad Zaffar Laghari (FA23-BCS-169)
 """
@@ -6,27 +6,34 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+PROJECT_ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from gui.login import LoginScreen
-from gui.main_window import MainWindow
+from config import SETTINGS  # noqa: E402
+from gui.login import LoginScreen  # noqa: E402
+from gui.main_window import MainWindow  # noqa: E402
 
 
 def launch_main_app() -> None:
-    """Launch the main application window.
+    """Launch the main CyberSentinel application window.
 
     Author: Saad Zaffar Laghari (FA23-BCS-169)
     """
-    MainWindow().run()
+    _ = SETTINGS
+    app = MainWindow()
+    app.mainloop()
 
 
 def main() -> None:
-    """Show login screen then launch app.
+    """Run the CyberSentinel application.
 
     Author: Saad Zaffar Laghari (FA23-BCS-169)
     """
-    LoginScreen(launch_main_app).run()
+    login = LoginScreen(on_success_callback=launch_main_app)
+    login.mainloop()
 
 
 if __name__ == "__main__":
